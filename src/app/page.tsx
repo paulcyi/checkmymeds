@@ -55,11 +55,6 @@ export default function Home() {
 
       <div className="max-w-2xl mx-auto space-y-8">
 
-        {/* ✅ Visual test */}
-        <div className="p-4 rounded bg-white text-black dark:bg-gray-900 dark:text-white border">
-          This block should change color when you toggle themes.
-        </div>
-
         {/* Hero Section */}
         <section className="text-center space-y-4 py-10">
           <h1 className="text-4xl font-bold tracking-tight text-blue-700 dark:text-blue-300">
