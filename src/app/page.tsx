@@ -1,103 +1,168 @@
-import Image from "next/image";
+'use client';
+
+import { useState } from 'react';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [drug1, setDrug1] = useState('');
+  const [drug2, setDrug2] = useState('');
+  const [result, setResult] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const handleCheck = async () => {
+    if (!drug1 || !drug2) return;
+
+    setLoading(true);
+    setResult(null);
+
+    try {
+      const res = await fetch('http://localhost:8000/api/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ drug1, drug2 }),
+      });
+
+      const data = await res.json();
+      setResult(data);
+    } catch (err) {
+      console.error(err);
+      setResult({ status: 'error', message: 'Failed to fetch interaction data.' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const generateSummaryForFrontend = (highlightedTexts: any): string => {
+    const flatText = Object.values(highlightedTexts).flat().join(' ').toLowerCase();
+
+    if (flatText.includes('bleed')) return 'This combo may increase bleeding risk.';
+    if (flatText.includes('liver')) return 'Possible liver toxicity.';
+    if (flatText.includes('serotonin')) return 'May raise serotonin dangerously (serotonin syndrome).';
+    if (flatText.includes('cns')) return 'May increase sedation or CNS depression.';
+    if (flatText.includes('respiratory')) return 'May slow down breathing (respiratory depression).';
+    if (flatText.includes('renal') || flatText.includes('kidney')) return 'May impair kidney function.';
+
+    return 'This label combination may increase risk of side effects. Monitor closely.';
+  };
+
+  return (
+    <main className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-6">
+      <div className="max-w-2xl mx-auto space-y-6">
+        <h1 className="text-3xl font-bold">💊 CheckMyMeds</h1>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <input
+            className="w-full p-2 border rounded dark:bg-gray-800"
+            value={drug1}
+            onChange={(e) => setDrug1(e.target.value)}
+            placeholder="First drug"
+          />
+          <input
+            className="w-full p-2 border rounded dark:bg-gray-800"
+            value={drug2}
+            onChange={(e) => setDrug2(e.target.value)}
+            placeholder="Second drug"
+          />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+
+        <button
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+          onClick={handleCheck}
+          disabled={loading}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          {loading ? 'Checking...' : 'Check Interaction'}
+        </button>
+
+        {/* RxNav interaction results */}
+        {result?.status === 'success' && result.interactions?.length > 0 && (
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Interactions Found</h2>
+            {result.interactions.map((interaction: any, index: number) => (
+              <div
+                key={index}
+                className="p-4 rounded border dark:border-gray-700 bg-gray-50 dark:bg-gray-800"
+              >
+                <p className="mb-1 text-sm text-gray-600 dark:text-gray-300">
+                  <span className="font-semibold">Severity:</span>{' '}
+                  <span
+                    className={`inline-block px-2 py-0.5 rounded text-white text-xs ${interaction.severity === 'High'
+                        ? 'bg-red-600'
+                        : interaction.severity === 'Moderate'
+                          ? 'bg-yellow-500'
+                          : 'bg-green-600'
+                      }`}
+                  >
+                    {interaction.severity}
+                  </span>
+                </p>
+                <p className="mb-1 text-sm">
+                  <span className="font-semibold">Description:</span>{' '}
+                  {interaction.description}
+                </p>
+                <p className="text-sm text-gray-500">
+                  <span className="font-semibold">Source:</span> {interaction.source}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* No interactions */}
+        {result?.status === 'success' && result.interactions?.length === 0 && (
+          <p className="mt-6 text-sm text-green-700 dark:text-green-400">
+            ✅ No known interactions found.
+          </p>
+        )}
+
+        {/* OpenFDA label mentions */}
+        {result?.status === 'label_mentions' && (
+          <div className="space-y-6">
+            <h2 className="text-xl font-semibold text-yellow-600 dark:text-yellow-400">
+              ⚠️ Potential label-based interactions (OpenFDA fallback)
+            </h2>
+            {result.mentions.map((mention: any, index: number) => {
+              const entries = Object.entries(mention.results.highlighted_texts) as [string, string[]][];
+              return (
+                <div
+                  key={index}
+                  className="p-4 border rounded bg-yellow-50 dark:bg-yellow-900 border-yellow-300 dark:border-yellow-700"
+                >
+                  <h3 className="text-md font-semibold mb-2">
+                    {mention.sourceDrug} mentions {mention.mentionedDrug} in its label
+                  </h3>
+
+                  {entries.map(([section, texts], sectionIdx) => (
+                    <div key={sectionIdx} className="mb-2">
+                      <p className="font-semibold text-sm capitalize text-gray-700 dark:text-gray-300">
+                        {section.replace(/_/g, ' ')}
+                      </p>
+                      {texts.map((text, textIdx) => (
+                        <div
+                          key={textIdx}
+                          className="bg-white dark:bg-gray-800 border-l-4 border-yellow-400 pl-4 py-2 mb-1 text-sm"
+                          dangerouslySetInnerHTML={{ __html: text }}
+                        />
+                      ))}
+                    </div>
+                  ))}
+
+                  <div className="mt-2 text-sm italic text-gray-700 dark:text-gray-300">
+                    🧠 Summary:{' '}
+                    {mention.results.highlighted_texts &&
+                      generateSummaryForFrontend(mention.results.highlighted_texts)}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Error */}
+        {result?.status === 'error' && (
+          <p className="mt-6 text-sm text-red-600 dark:text-red-400">
+            ⚠️ {result.message}
+          </p>
+        )}
+      </div>
+    </main>
   );
 }
