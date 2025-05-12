@@ -89,10 +89,10 @@ export default function Home() {
                   <span className="font-semibold">Severity:</span>{' '}
                   <span
                     className={`inline-block px-2 py-0.5 rounded text-white text-xs ${interaction.severity === 'High'
-                        ? 'bg-cmm-severity-severe'
-                        : interaction.severity === 'Moderate'
-                          ? 'bg-cmm-severity-mod'
-                          : 'bg-cmm-severity-mild'
+                      ? 'bg-cmm-severity-severe'
+                      : interaction.severity === 'Moderate'
+                        ? 'bg-cmm-severity-mod'
+                        : 'bg-cmm-severity-mild'
                       }`}
                   >
                     {interaction.severity}
