@@ -46,35 +46,49 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-cmm-surface text-gray-900 dark:bg-cmm-surface-900 dark:text-white p-6">
-      <div className="max-w-2xl mx-auto space-y-6">
-        <h1 className="text-3xl font-bold text-cmm-primary-600">💊 CheckMyMeds</h1>
+      <div className="max-w-2xl mx-auto space-y-8">
 
-        <div className="rounded p-4 bg-cmm-primary-500 text-white">
-          ✅ Tailwind token works — this box is teal
-        </div>
+        {/* Hero Section */}
+        <section className="text-center space-y-4 py-10">
+          <h1 className="text-4xl font-bold tracking-tight text-cmm-primary-600">
+            CheckMyMeds
+          </h1>
+          <p className="text-lg text-gray-700 dark:text-gray-300 max-w-xl mx-auto">
+            Instantly check for drug interactions and label-based risks—free and private.
+          </p>
+        </section>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <input
-            className="w-full p-2 border rounded dark:bg-gray-800"
-            value={drug1}
-            onChange={(e) => setDrug1(e.target.value)}
-            placeholder="First drug"
-          />
-          <input
-            className="w-full p-2 border rounded dark:bg-gray-800"
-            value={drug2}
-            onChange={(e) => setDrug2(e.target.value)}
-            placeholder="Second drug"
-          />
-        </div>
-
-        <button
-          className="bg-cmm-accent-600 hover:bg-cmm-accent-700 text-white px-4 py-2 rounded disabled:opacity-50"
-          onClick={handleCheck}
-          disabled={loading}
+        {/* Search Form */}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleCheck();
+          }}
+          className="space-y-4"
         >
-          {loading ? 'Checking...' : 'Check Interaction'}
-        </button>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <input
+              className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800"
+              value={drug1}
+              onChange={(e) => setDrug1(e.target.value)}
+              placeholder="First drug"
+            />
+            <input
+              className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800"
+              value={drug2}
+              onChange={(e) => setDrug2(e.target.value)}
+              placeholder="Second drug"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full sm:w-auto bg-cmm-accent-600 hover:bg-cmm-accent-700 text-white font-medium px-6 py-3 rounded-md transition-all disabled:opacity-50"
+            disabled={loading}
+          >
+            {loading ? 'Checking...' : 'Check Interaction'}
+          </button>
+        </form>
 
         {/* RxNav interaction results */}
         {result?.status === 'success' && result.interactions?.length > 0 && (
@@ -89,10 +103,10 @@ export default function Home() {
                   <span className="font-semibold">Severity:</span>{' '}
                   <span
                     className={`inline-block px-2 py-0.5 rounded text-white text-xs ${interaction.severity === 'High'
-                      ? 'bg-cmm-severity-severe'
-                      : interaction.severity === 'Moderate'
-                        ? 'bg-cmm-severity-mod'
-                        : 'bg-cmm-severity-mild'
+                        ? 'bg-cmm-severity-severe'
+                        : interaction.severity === 'Moderate'
+                          ? 'bg-cmm-severity-mod'
+                          : 'bg-cmm-severity-mild'
                       }`}
                   >
                     {interaction.severity}
