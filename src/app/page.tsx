@@ -45,9 +45,13 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-6">
+    <main className="min-h-screen bg-cmm-surface text-gray-900 dark:bg-cmm-surface-900 dark:text-white p-6">
       <div className="max-w-2xl mx-auto space-y-6">
-        <h1 className="text-3xl font-bold">💊 CheckMyMeds</h1>
+        <h1 className="text-3xl font-bold text-cmm-primary-600">💊 CheckMyMeds</h1>
+
+        <div className="rounded p-4 bg-cmm-primary-500 text-white">
+          ✅ Tailwind token works — this box is teal
+        </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <input
@@ -65,7 +69,7 @@ export default function Home() {
         </div>
 
         <button
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+          className="bg-cmm-accent-600 hover:bg-cmm-accent-700 text-white px-4 py-2 rounded disabled:opacity-50"
           onClick={handleCheck}
           disabled={loading}
         >
@@ -85,10 +89,10 @@ export default function Home() {
                   <span className="font-semibold">Severity:</span>{' '}
                   <span
                     className={`inline-block px-2 py-0.5 rounded text-white text-xs ${interaction.severity === 'High'
-                        ? 'bg-red-600'
+                        ? 'bg-cmm-severity-severe'
                         : interaction.severity === 'Moderate'
-                          ? 'bg-yellow-500'
-                          : 'bg-green-600'
+                          ? 'bg-cmm-severity-mod'
+                          : 'bg-cmm-severity-mild'
                       }`}
                   >
                     {interaction.severity}
@@ -113,7 +117,7 @@ export default function Home() {
           </p>
         )}
 
-        {/* OpenFDA label mentions */}
+        {/* OpenFDA fallback */}
         {result?.status === 'label_mentions' && (
           <div className="space-y-6">
             <h2 className="text-xl font-semibold text-yellow-600 dark:text-yellow-400">
