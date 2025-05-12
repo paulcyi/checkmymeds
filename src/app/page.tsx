@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+// Remove duplicate import of ThemeToggle since it's already in layout.tsx
+// import ThemeToggle from '@/components/ThemeToggle';
 
 export default function Home() {
   const [drug1, setDrug1] = useState('');
@@ -45,12 +47,22 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-cmm-surface text-gray-900 dark:bg-cmm-surface-900 dark:text-white p-6">
+    <main className="min-h-screen bg-white text-black dark:bg-gray-900 dark:text-white p-6">
+      {/* Remove duplicate toggle from here - it's already in layout.tsx */}
+      {/* <div className="fixed top-4 right-4 z-50">
+        <ThemeToggle />
+      </div> */}
+
       <div className="max-w-2xl mx-auto space-y-8">
+
+        {/* ✅ Visual test */}
+        <div className="p-4 rounded bg-white text-black dark:bg-gray-900 dark:text-white border">
+          This block should change color when you toggle themes.
+        </div>
 
         {/* Hero Section */}
         <section className="text-center space-y-4 py-10">
-          <h1 className="text-4xl font-bold tracking-tight text-cmm-primary-600">
+          <h1 className="text-4xl font-bold tracking-tight text-blue-700 dark:text-blue-300">
             CheckMyMeds
           </h1>
           <p className="text-lg text-gray-700 dark:text-gray-300 max-w-xl mx-auto">
@@ -83,14 +95,14 @@ export default function Home() {
 
           <button
             type="submit"
-            className="w-full sm:w-auto bg-cmm-accent-600 hover:bg-cmm-accent-700 text-white font-medium px-6 py-3 rounded-md transition-all disabled:opacity-50"
+            className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-md transition-all disabled:opacity-50"
             disabled={loading}
           >
             {loading ? 'Checking...' : 'Check Interaction'}
           </button>
         </form>
 
-        {/* RxNav interaction results */}
+        {/* Results */}
         {result?.status === 'success' && result.interactions?.length > 0 && (
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Interactions Found</h2>
@@ -103,18 +115,17 @@ export default function Home() {
                   <span className="font-semibold">Severity:</span>{' '}
                   <span
                     className={`inline-block px-2 py-0.5 rounded text-white text-xs ${interaction.severity === 'High'
-                        ? 'bg-cmm-severity-severe'
-                        : interaction.severity === 'Moderate'
-                          ? 'bg-cmm-severity-mod'
-                          : 'bg-cmm-severity-mild'
+                      ? 'bg-red-600'
+                      : interaction.severity === 'Moderate'
+                        ? 'bg-yellow-600'
+                        : 'bg-green-600'
                       }`}
                   >
                     {interaction.severity}
                   </span>
                 </p>
                 <p className="mb-1 text-sm">
-                  <span className="font-semibold">Description:</span>{' '}
-                  {interaction.description}
+                  <span className="font-semibold">Description:</span> {interaction.description}
                 </p>
                 <p className="text-sm text-gray-500">
                   <span className="font-semibold">Source:</span> {interaction.source}
