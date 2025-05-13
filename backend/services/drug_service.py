@@ -20,17 +20,21 @@ async def fetch_interactions(rxcuis: List[str]) -> List[str]:
         return []
 
     rxcui_str = "+".join(rxcuis)
+    url = f"https://rxnav.nlm.nih.gov/REST/interaction/list.json"
+
     async with httpx.AsyncClient(timeout=10) as client:
-        res = await client.get(f"{RXNAV_BASE_URL}/interaction/list.json", params={"rxcuis": rxcui_str})
+        res = await client.get(url, params={"rxcuis": rxcui_str})
+        if res.status_code == 404:
+            return []  # No known interactions
         res.raise_for_status()
         data = res.json()
 
     results = []
-    interactions = data.get("fullInteractionTypeGroup", [])
-    for group in interactions:
-        for interactionType in group.get("fullInteractionType", []):
-            for interactionPair in interactionType.get("interactionPair", []):
-                desc = interactionPair.get("description")
+    groups = data.get("fullInteractionTypeGroup", [])
+    for group in groups:
+        for interaction_type in group.get("fullInteractionType", []):
+            for interaction_pair in interaction_type.get("interactionPair", []):
+                desc = interaction_pair.get("description")
                 if desc:
                     results.append(desc)
 
