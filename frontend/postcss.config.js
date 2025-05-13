@@ -1,8 +1,7 @@
-// postcss.config.js
+// postcss.config.js  (CommonJS)
 module.exports = {
   plugins: {
-    // Tailwind v3 needs explicit nesting plugin
-    'tailwindcss/nesting': {},
+    'tailwindcss/nesting': {},   // required in v3
     tailwindcss: {},
     autoprefixer: {},
   },

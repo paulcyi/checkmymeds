@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* your base font stack, if you want: */
+/* optional custom base layer */
 @layer base {
   html {
     font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
