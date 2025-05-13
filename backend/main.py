@@ -1,12 +1,14 @@
+# --- Env config ---
+from dotenv import load_dotenv
+load_dotenv()  # Load environment variables from .env
+
+# --- FastAPI setup ---
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List
-
 from backend.services.interaction_service import find_interactions
 from backend.services.summarizer_service import summarise
 
-from dotenv import load_dotenv
-load_dotenv()  # ensure .env is loaded before reading API keys or config
 
 app = FastAPI()
 
