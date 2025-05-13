@@ -6,26 +6,31 @@ RXNAV_BASE_URL = "https://rxnav.nlm.nih.gov/REST"
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential())
 async def fetch_rxcui(drug: str) -> str:
-    """Get RxCUI (RxNorm Concept Unique Identifier) for a drug name."""
     async with httpx.AsyncClient(timeout=10) as client:
         res = await client.get(f"{RXNAV_BASE_URL}/rxcui.json", params={"name": drug})
         res.raise_for_status()
         data = res.json()
-        return data.get("idGroup", {}).get("rxnormId", [None])[0]
+        rxcui = data.get("idGroup", {}).get("rxnormId", [None])[0]
+        print(f"[DEBUG] RxCUI for '{drug}':", rxcui)
+        return rxcui
+
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential())
 async def fetch_interactions(rxcuis: List[str]) -> List[str]:
-    """Fetch interaction descriptions for a list of RxCUIs."""
     if len(rxcuis) < 2:
+        print("[DEBUG] Not enough RxCUIs for interaction check:", rxcuis)
         return []
 
     rxcui_str = "+".join(rxcuis)
-    url = f"https://rxnav.nlm.nih.gov/REST/interaction/list.json"
+    url = f"{RXNAV_BASE_URL}/interaction/list.json"
+    print(f"[DEBUG] Fetching interactions for: {rxcui_str}")
 
     async with httpx.AsyncClient(timeout=10) as client:
         res = await client.get(url, params={"rxcuis": rxcui_str})
+        print("[DEBUG] Raw status code:", res.status_code)
+        print("[DEBUG] Response text:", await res.aread())
         if res.status_code == 404:
-            return []  # No known interactions
+            return []
         res.raise_for_status()
         data = res.json()
 

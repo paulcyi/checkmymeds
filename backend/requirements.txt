@@ -6,3 +6,4 @@ redis==6.0.0               # async/await support :contentReference[oaicite:1]{in
 tenacity==8.3.0            # retry decorator
 python-dotenv==1.0.1       # env vars for prod
 pydantic==2.7.1
+openai>=1.14.0

@@ -8,11 +8,12 @@ from functools import lru_cache
 from typing import Optional
 
 # Load environment config
-PROVIDER = os.getenv("PROVIDER", "openai")  # Can support grok, litellm, ollama later
+PROVIDER = os.getenv("PROVIDER", "openai")
 MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")
 TIMEOUT = int(os.getenv("LLM_TIMEOUT", "15"))
+DEBUG = os.getenv("DEBUG_SUMMARIZER", "0") == "1"
 
-# Set up client based on provider
+# Set up client
 if PROVIDER == "openai":
     from openai import OpenAI
     _client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"), timeout=TIMEOUT)
@@ -21,7 +22,7 @@ elif PROVIDER == "litellm":
 else:
     raise RuntimeError(f"Unsupported PROVIDER '{PROVIDER}'")
 
-# System prompt to guide the model
+# Prompt engineering
 _SYSTEM = (
     "You are a clinical-pharmacist assistant. "
     "Rewrite the following FDA drug-label interaction in 1–2 short sentences, "
@@ -30,10 +31,11 @@ _SYSTEM = (
 )
 
 @lru_cache(maxsize=2048)
-def summarise(drug_a: str, drug_b: str, interaction_text: str) -> str:
+def summarise(drug_a: str, drug_b: str, interaction_text: str) -> Optional[str]:
     """Return a plain-language, safety-focused summary of the interaction."""
-    if not interaction_text.strip():
-        return ""
+    interaction_text = interaction_text.strip()
+    if not interaction_text:
+        return None
 
     prompt = (
         f"Drug A: {drug_a}\n"
@@ -41,29 +43,38 @@ def summarise(drug_a: str, drug_b: str, interaction_text: str) -> str:
         f"FDA-label text:\n{interaction_text}"
     )
 
-    if PROVIDER == "openai":
-        resp = _client.chat.completions.create(
-            model=MODEL,
-            messages=[
-                {"role": "system", "content": _SYSTEM},
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=120,
-            temperature=0.4
-        )
-        return resp.choices[0].message.content.strip()
+    if DEBUG:
+        print(f"[DEBUG] Prompt to {PROVIDER} ({MODEL}):\n{prompt}\n")
 
-    elif PROVIDER == "litellm":
-        resp = completion(
-            model=MODEL,
-            messages=[
-                {"role": "system", "content": _SYSTEM},
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=120,
-            temperature=0.4,
-            stream=False,
-        )
-        return resp["choices"][0]["message"]["content"].strip()
+    try:
+        if PROVIDER == "openai":
+            resp = _client.chat.completions.create(
+                model=MODEL,
+                messages=[
+                    {"role": "system", "content": _SYSTEM},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=120,
+                temperature=0.4
+            )
+            return resp.choices[0].message.content.strip()
 
-    raise RuntimeError("summarise() provider dispatch failed")
+        elif PROVIDER == "litellm":
+            resp = completion(
+                model=MODEL,
+                messages=[
+                    {"role": "system", "content": _SYSTEM},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=120,
+                temperature=0.4,
+                stream=False,
+            )
+            return resp["choices"][0]["message"]["content"].strip()
+
+    except Exception as e:
+        if DEBUG:
+            print(f"[ERROR] summarise() failed: {e}")
+        return None
+
+    raise RuntimeError("summarise() provider dispatch failed unexpectedly")
