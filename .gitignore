@@ -63,3 +63,4 @@ repomix-output.xml
 ########################
 *.tsbuildinfo
 next-env.d.ts    # ← REMOVE this line if you want it committed
+.env
